@@ -1,0 +1,270 @@
+{% extends "base.html" %}
+
+{% block title %}Panel de Control - {{ business.name }} | FideliPass{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    
+    <!-- Cabecera del Comercio con Acciones Principales -->
+    <div class="p-6 sm:p-8 rounded-3xl bg-slate-900 border border-slate-800 shadow-xl mb-8 flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+        <div class="flex items-center gap-4">
+            <div class="w-16 h-16 rounded-2xl flex items-center justify-center text-3xl shadow-lg" style="background-color: {{ business.primary_color }};">
+                {{ business.icon_emoji }}
+            </div>
+            <div>
+                <div class="flex items-center gap-2">
+                    <h1 class="text-2xl sm:text-3xl font-extrabold text-white">{{ business.name }}</h1>
+                    <span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">
+                        {{ business.category }}
+                    </span>
+                </div>
+                <p class="text-sm text-slate-400 mt-1">
+                    Meta: <strong>{{ business.max_stamps }} sellos</strong> ➔ 🎁 <span class="text-amber-300 font-semibold">{{ business.reward_title }}</span>
+                </p>
+            </div>
+        </div>
+
+        <!-- Barra de Botones de Acción -->
+        <div class="flex flex-wrap items-center gap-3 w-full md:w-auto">
+            <!-- Terminal de Caja -->
+            <a href="{{ url_for('merchant_terminal', slug=business.slug) }}" 
+               class="flex-1 sm:flex-none inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl font-bold text-white bg-emerald-600 hover:bg-emerald-500 shadow-lg shadow-emerald-600/25 transition-all glow-on-hover text-sm">
+                <span>📸 Terminal de Caja</span>
+            </a>
+
+            <!-- Stand de Mostrador (Imprimible) -->
+            <a href="{{ url_for('business_stand', slug=business.slug) }}" target="_blank"
+               class="flex-1 sm:flex-none inline-flex items-center justify-center gap-2 px-4 py-3 rounded-xl font-semibold text-slate-200 bg-slate-800 hover:bg-slate-700 transition-all text-sm border border-slate-700">
+                <span>🪧 Stand de Mostrador</span>
+            </a>
+
+            <!-- Enlace para registrar cliente -->
+            <a href="{{ url_for('customer_join', slug=business.slug) }}" target="_blank"
+               class="flex-1 sm:flex-none inline-flex items-center justify-center gap-2 px-4 py-3 rounded-xl font-semibold text-indigo-300 bg-indigo-950/60 hover:bg-indigo-900/60 transition-all text-sm border border-indigo-800/60">
+                <span>➕ Registrar Cliente</span>
+            </a>
+        </div>
+    </div>
+
+    <!-- Tarjetas de Métricas / KPIs -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-8">
+        <!-- Clientes Totales -->
+        <div class="p-5 rounded-2xl bg-slate-900 border border-slate-800 shadow">
+            <div class="flex justify-between items-start">
+                <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">Clientes Activos</span>
+                <span class="text-xl">👥</span>
+            </div>
+            <div class="text-3xl font-extrabold text-white mt-2">{{ stats.total_customers }}</div>
+            <div class="text-xs text-emerald-400 mt-1 flex items-center gap-1">
+                <span>↑ 100% retención en Wallet</span>
+            </div>
+        </div>
+
+        <!-- Sellos Totales -->
+        <div class="p-5 rounded-2xl bg-slate-900 border border-slate-800 shadow">
+            <div class="flex justify-between items-start">
+                <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">Sellos Acumulados</span>
+                <span class="text-xl">{{ business.icon_emoji }}</span>
+            </div>
+            <div class="text-3xl font-extrabold text-white mt-2">{{ stats.total_stamps }}</div>
+            <div class="text-xs text-slate-400 mt-1">Sellos en billeteras activas</div>
+        </div>
+
+        <!-- Premios Canjeados -->
+        <div class="p-5 rounded-2xl bg-slate-900 border border-slate-800 shadow">
+            <div class="flex justify-between items-start">
+                <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">Premios Canjeados</span>
+                <span class="text-xl">🎁</span>
+            </div>
+            <div class="text-3xl font-extrabold text-white mt-2">{{ stats.total_rewards }}</div>
+            <div class="text-xs text-amber-400 mt-1">Recompensas disfrutadas</div>
+        </div>
+
+        <!-- Listos para Canjear (Alta intención de compra) -->
+        <div class="p-5 rounded-2xl bg-gradient-to-br from-amber-950/40 to-slate-900 border border-amber-800/40 shadow">
+            <div class="flex justify-between items-start">
+                <span class="text-xs font-bold text-amber-300 uppercase tracking-wider">Premios Listos</span>
+                <span class="text-xl">⚡</span>
+            </div>
+            <div class="text-3xl font-extrabold text-amber-400 mt-2">{{ stats.ready_for_reward }}</div>
+            <div class="text-xs text-slate-300 mt-1">Clientes listos para canjear hoy</div>
+        </div>
+    </div>
+
+    <!-- Sección de Clientes y Stand de Mostrador -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+        
+        <!-- Tabla de Clientes (CRM) -->
+        <div class="lg:col-span-8 bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-xl">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+                <div>
+                    <h2 class="text-lg font-bold text-white">Clientes con Tarjeta de Sellos</h2>
+                    <p class="text-xs text-slate-400">Listado sincronizado en tiempo real con Apple & Google Wallet</p>
+                </div>
+                <div class="relative w-full sm:w-64">
+                    <input type="text" id="customer-search" placeholder="Buscar por nombre o teléfono..."
+                           class="w-full pl-9 pr-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500">
+                    <svg class="w-4 h-4 text-slate-500 absolute left-3 top-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                </div>
+            </div>
+
+            {% if cards %}
+            <div class="overflow-x-auto">
+                <table class="w-full text-left text-xs" id="customers-table">
+                    <thead>
+                        <tr class="border-b border-slate-800 text-slate-400 uppercase font-semibold">
+                            <th class="pb-3 pl-2">Cliente</th>
+                            <th class="pb-3">Sellos</th>
+                            <th class="pb-3">Progreso</th>
+                            <th class="pb-3">Estado</th>
+                            <th class="pb-3 pr-2 text-right">Acción</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-800/60">
+                        {% for card in cards %}
+                        {% set pct = (card.stamps_count / business.max_stamps * 100)|round|int %}
+                        {% set is_ready = card.stamps_count >= business.max_stamps %}
+                        <tr class="hover:bg-slate-800/40 transition-colors customer-row">
+                            <td class="py-3.5 pl-2">
+                                <div class="font-bold text-white text-sm customer-name">{{ card.customer_name }}</div>
+                                <div class="text-[11px] text-slate-400 flex items-center gap-2 customer-phone">
+                                    <span>{{ card.customer_phone or 'Sin teléfono' }}</span>
+                                    {% if card.customer_phone %}
+                                    <a href="https://wa.me/{{ card.customer_phone|replace(' ', '')|replace('+', '') }}" target="_blank" class="text-emerald-400 hover:underline">
+                                        WhatsApp ↗
+                                    </a>
+                                    {% endif %}
+                                </div>
+                            </td>
+                            <td class="py-3.5">
+                                <div class="font-extrabold text-sm text-slate-200">
+                                    {{ card.stamps_count }} <span class="text-slate-500 font-normal">/ {{ business.max_stamps }}</span>
+                                </div>
+                                <div class="text-[10px] text-slate-500">{{ card.rewards_redeemed }} canjeados</div>
+                            </td>
+                            <td class="py-3.5 w-32">
+                                <div class="w-full bg-slate-800 h-2 rounded-full overflow-hidden mb-1">
+                                    <div class="h-full rounded-full {% if is_ready %}bg-amber-400{% else %}bg-indigo-500{% endif %}" style="width: {{ pct if pct <= 100 else 100 }}%;"></div>
+                                </div>
+                                <div class="text-[10px] text-slate-400 font-medium">{{ pct }}%</div>
+                            </td>
+                            <td class="py-3.5">
+                                {% if is_ready %}
+                                <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-amber-400/20 text-amber-300 font-bold border border-amber-400/30 text-[11px] animate-pulse">
+                                    🎁 ¡Premio Listo!
+                                </span>
+                                {% elif card.stamps_count == 0 %}
+                                <span class="px-2 py-0.5 rounded-full bg-slate-800 text-slate-400 text-[10px]">
+                                    Nuevo
+                                </span>
+                                {% else %}
+                                <span class="px-2 py-0.5 rounded-full bg-indigo-500/10 text-indigo-300 text-[10px]">
+                                    Faltan {{ business.max_stamps - card.stamps_count }}
+                                </span>
+                                {% endif %}
+                            </td>
+                            <td class="py-3.5 pr-2 text-right">
+                                <a href="{{ url_for('card_view', token=card.token) }}" target="_blank"
+                                   class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-white font-medium text-xs transition-colors">
+                                    <span>Ver Pase ↗</span>
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="text-center py-12 text-slate-500">
+                <p class="text-3xl mb-2">🎟️</p>
+                <p class="font-medium text-slate-300">Aún no hay clientes registrados</p>
+                <p class="text-xs mt-1">Coloca el stand con código QR en tu mostrador para que tus clientes comiencen a guardar su tarjeta digital.</p>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Columna Derecha: QR de Mostrador y Enlace Rápido -->
+        <div class="lg:col-span-4 space-y-6">
+            
+            <!-- Tarjeta de Stand de Mostrador Rápido -->
+            <div class="p-6 rounded-3xl bg-slate-900 border border-slate-800 shadow-xl text-center space-y-4">
+                <div class="flex justify-between items-center text-xs text-slate-400">
+                    <span class="font-bold uppercase tracking-wider">Stand de Mostrador</span>
+                    <a href="{{ url_for('business_stand', slug=business.slug) }}" target="_blank" class="text-indigo-400 hover:underline">
+                        Imprimir 🖨️
+                    </a>
+                </div>
+
+                <div class="bg-white p-4 rounded-2xl inline-block shadow-lg mx-auto">
+                    <img src="{{ join_qr_b64 }}" alt="QR de Registro de Clientes" class="w-44 h-44 object-contain">
+                </div>
+
+                <div>
+                    <h3 class="font-bold text-white text-sm">Escanea para unirte al programa</h3>
+                    <p class="text-xs text-slate-400 mt-1">Tus clientes apuntan con la cámara de su móvil y guardan la tarjeta en Apple o Google Wallet.</p>
+                </div>
+
+                <div class="pt-2">
+                    <button onclick="copyJoinLink()" class="w-full py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold flex items-center justify-center gap-2 transition-all">
+                        <span>📋 Copiar Enlace de Registro</span>
+                    </button>
+                    <input type="hidden" id="join-url-input" value="{{ join_url }}">
+                </div>
+            </div>
+
+            <!-- Registro Rápido en Caja -->
+            <div class="p-6 rounded-3xl bg-slate-900/60 border border-slate-800 shadow-xl">
+                <h3 class="font-bold text-white text-sm mb-2 flex items-center gap-2">
+                    <span>⚡</span> ¿Un cliente no tiene cámara?
+                </h3>
+                <p class="text-xs text-slate-400 mb-4">
+                    Puedes dar de alta a un cliente manualmente en caja escribiendo su nombre y teléfono:
+                </p>
+                <form action="{{ url_for('customer_join', slug=business.slug) }}" method="POST" class="space-y-3">
+                    <input type="text" name="customer_name" required placeholder="Nombre del cliente"
+                           class="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-xs text-white focus:outline-none focus:border-indigo-500">
+                    <input type="text" name="customer_phone" placeholder="WhatsApp / Teléfono"
+                           class="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-xs text-white focus:outline-none focus:border-indigo-500">
+                    <button type="submit" class="w-full py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs shadow transition-all">
+                        Crear y Abrir Tarjeta
+                    </button>
+                </form>
+            </div>
+
+        </div>
+
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+    // Filtro de búsqueda de clientes
+    const searchInput = document.getElementById("customer-search");
+    if (searchInput) {
+        searchInput.addEventListener("input", function() {
+            const query = this.value.toLowerCase().trim();
+            const rows = document.querySelectorAll(".customer-row");
+            
+            rows.forEach(row => {
+                const name = row.querySelector(".customer-name").innerText.toLowerCase();
+                const phone = row.querySelector(".customer-phone").innerText.toLowerCase();
+                if (name.includes(query) || phone.includes(query)) {
+                    row.style.display = "";
+                } else {
+                    row.style.display = "none";
+                }
+            });
+        });
+    }
+
+    function copyJoinLink() {
+        const url = document.getElementById("join-url-input").value;
+        navigator.clipboard.writeText(url).then(() => {
+            window.showToast("¡Enlace de registro copiado al portapapeles!", "success");
+        }).catch(() => {
+            window.showToast("No se pudo copiar el enlace", "error");
+        });
+    }
+</script>
+{% endblock %}
