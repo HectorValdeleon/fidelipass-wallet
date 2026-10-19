@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stand de Mostrador - {{ business.name }}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+        @media print {
+            .no-print {
+                display: none !important;
+            }
+            body {
+                background: white !important;
+                color: black !important;
+                padding: 0 !important;
+            }
+            .print-card {
+                border: 2px solid #000 !important;
+                box-shadow: none !important;
+                max-width: 100% !important;
+                margin: 0 auto !important;
+            }
+        }
+    </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen py-10 px-4 flex flex-col items-center justify-center">
+    
+    <!-- Barra de Control Superior (Oculta al imprimir) -->
+    <div class="no-print max-w-lg w-full mb-6 flex justify-between items-center bg-slate-900 border border-slate-800 p-4 rounded-2xl shadow-xl">
+        <a href="{{ url_for('business_dashboard', slug=business.slug) }}" class="text-xs font-semibold text-slate-300 hover:text-white flex items-center gap-1.5">
+            <span>←</span> Volver al Panel
+        </a>
+        <button onclick="window.print()" class="px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs flex items-center gap-2 shadow-lg shadow-indigo-600/30 transition-all">
+            <span>🖨️</span> Imprimir Stand para Mostrador
+        </button>
+    </div>
+
+    <!-- EL STAND IMPRIMIBLE (Formato Table Tent / A5 / A6) -->
+    <div class="print-card max-w-md w-full bg-white text-slate-900 rounded-[2.5rem] p-8 shadow-2xl border-4 border-slate-200 text-center relative overflow-hidden">
+        
+        <!-- Banda superior de color de la marca -->
+        <div class="h-4 w-full absolute top-0 left-0" style="background-color: {{ business.primary_color }};"></div>
+
+        <!-- Logotipo / Emoji del Negocio -->
+        <div class="mt-2 mb-4">
+            <div class="w-20 h-20 rounded-3xl mx-auto flex items-center justify-center text-4xl shadow-md" style="background-color: {{ business.primary_color }}; color: white;">
+                {{ business.icon_emoji }}
+            </div>
+        </div>
+
+        <!-- Nombre del Negocio y Categoría -->
+        <span class="text-xs font-extrabold uppercase tracking-widest text-indigo-600">{{ business.category }}</span>
+        <h1 class="text-3xl font-black tracking-tight text-slate-950 mt-1 mb-1">{{ business.name }}</h1>
+        <p class="text-xs text-slate-500 font-medium mb-5">{{ business.tagline }}</p>
+
+        <!-- Bloque de la Recompensa Prometida -->
+        <div class="p-4 rounded-2xl bg-amber-50 border-2 border-amber-300 mb-6">
+            <div class="text-[11px] font-black uppercase tracking-wider text-amber-800 mb-0.5">CLUB DE FIDELIDAD</div>
+            <div class="text-xl font-black text-amber-950 leading-tight">
+                ¡Por cada {{ business.max_stamps }} visitas, 1 premio gratis!
+            </div>
+            <div class="text-xs font-bold text-amber-700 mt-1">
+                🎁 {{ business.reward_title }}
+            </div>
+        </div>
+
+        <!-- CÓDIGO QR DE ALTA RESOLUCIÓN -->
+        <div class="inline-block p-4 rounded-3xl bg-slate-50 border-2 border-slate-200 shadow-inner my-2">
+            <img src="{{ qr_b64 }}" alt="Escanea con tu cámara" class="w-56 h-56 object-contain mx-auto">
+        </div>
+
+        <div class="mt-3">
+            <span class="inline-block px-4 py-1.5 rounded-full bg-slate-950 text-white font-extrabold text-xs tracking-wide">
+                📸 ESCANEA CON TU CÁMARA
+            </span>
+        </div>
+
+        <!-- 3 Pasos Claros para el Cliente -->
+        <div class="grid grid-cols-3 gap-2 mt-6 pt-5 border-t border-slate-200 text-left">
+            <div class="p-2">
+                <div class="text-indigo-600 font-black text-sm mb-0.5">1. Apunta</div>
+                <div class="text-[10px] text-slate-600 leading-tight">Abre la cámara de tu teléfono móvil.</div>
+            </div>
+            <div class="p-2 border-l border-slate-200">
+                <div class="text-indigo-600 font-black text-sm mb-0.5">2. Guarda</div>
+                <div class="text-[10px] text-slate-600 leading-tight">En Apple Wallet o Google Wallet.</div>
+            </div>
+            <div class="p-2 border-l border-slate-200">
+                <div class="text-indigo-600 font-black text-sm mb-0.5">3. Acumula</div>
+                <div class="text-[10px] text-slate-600 leading-tight">Muestra tu pantalla en cada compra.</div>
+            </div>
+        </div>
+
+        <!-- Pie con badges de Apple & Google Wallet -->
+        <div class="mt-6 pt-4 border-t border-slate-100 flex items-center justify-center gap-4 text-xs font-bold text-slate-500">
+            <span class="flex items-center gap-1">🍎 Apple Wallet</span>
+            <span>•</span>
+            <span class="flex items-center gap-1">🤖 Google Wallet</span>
+            <span>•</span>
+            <span>Sin descargar Apps</span>
+        </div>
+
+    </div>
+
+</body>
+</html>

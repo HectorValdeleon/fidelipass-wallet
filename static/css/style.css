@@ -1,0 +1,133 @@
+/* Estilos base y animaciones para FideliPass */
+:root {
+    --primary: #4f46e5;
+    --primary-dark: #3730a3;
+    --secondary: #0f172a;
+}
+
+body {
+    font-family: 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background-color: #0b0f19;
+    color: #f3f4f6;
+    overflow-x: hidden;
+}
+
+/* Glassmorphism Cards */
+.glass-panel {
+    background: rgba(17, 24, 39, 0.75);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.glass-panel-light {
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+/* Efecto 3D de Tarjeta Digital Wallet */
+.wallet-card-container {
+    perspective: 1200px;
+}
+
+.wallet-card-inner {
+    position: relative;
+    width: 100%;
+    transition: transform 0.7s cubic-bezier(0.4, 0.2, 0.2, 1);
+    transform-style: preserve-3d;
+}
+
+.wallet-card-container.flipped .wallet-card-inner {
+    transform: rotateY(180deg);
+}
+
+.wallet-card-face {
+    position: relative;
+    width: 100%;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    border-radius: 1.5rem;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5), 0 0 20px rgba(79, 70, 229, 0.2);
+}
+
+.wallet-card-back {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    transform: rotateY(180deg);
+}
+
+/* Sellos y círculos con animación */
+.stamp-slot {
+    position: relative;
+    width: 58px;
+    height: 58px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.stamp-slot.stamped {
+    transform: scale(1.05);
+    animation: stampPunch 0.45s ease-out forwards;
+}
+
+.stamp-slot.pulse-goal {
+    animation: pulseGoal 2s infinite ease-in-out;
+}
+
+@keyframes stampPunch {
+    0% {
+        transform: scale(2.2) rotate(-15deg);
+        opacity: 0.2;
+    }
+    60% {
+        transform: scale(0.9) rotate(5deg);
+        opacity: 1;
+    }
+    100% {
+        transform: scale(1) rotate(0deg);
+        opacity: 1;
+    }
+}
+
+@keyframes pulseGoal {
+    0%, 100% {
+        box-shadow: 0 0 0 0 rgba(234, 179, 8, 0.6);
+    }
+    50% {
+        box-shadow: 0 0 0 14px rgba(234, 179, 8, 0);
+    }
+}
+
+/* Efectos de brillo en botones */
+.glow-on-hover {
+    transition: all 0.3s ease;
+}
+.glow-on-hover:hover {
+    box-shadow: 0 0 25px rgba(99, 102, 241, 0.6);
+    transform: translateY(-2px);
+}
+
+/* Estilos de impresión para Stand de Mostrador (Table Tent) */
+@media print {
+    body {
+        background-color: white !important;
+        color: black !important;
+    }
+    .no-print {
+        display: none !important;
+    }
+    .print-stand {
+        box-shadow: none !important;
+        border: 2px dashed #999 !important;
+        page-break-inside: avoid;
+        margin: 0 auto !important;
+        max-width: 100% !important;
+    }
+}
